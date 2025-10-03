@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 const app = express();
 const port = 3000;
@@ -19,15 +20,25 @@ app.get('/', (req, res) => {
     message: 'API de Autenticación JWT - Desafío DPS 3',
     version: '1.0.0',
     endpoints: {
+      // Autenticación
       login: 'POST /auth/login',
       profile: 'GET /auth/profile (requiere token)',
-      verify: 'GET /auth/verify (requiere token)'
-    }
+      verify: 'GET /auth/verify (requiere token)',
+      // Productos
+      productos: 'GET /productos (requiere token)',
+      producto: 'GET /productos/:id (requiere token)',
+      updateStock: 'PUT /productos/:id (requiere token)',
+      estadisticas: 'GET /productos/stats (requiere token)'
+    },
+    note: 'Todos los endpoints de productos requieren autenticación con token JWT'
   });
 });
 
 // Rutas de autenticación
 app.use('/auth', authRoutes);
+
+// Rutas de productos
+app.use('/productos', productRoutes);
 
 // Middleware para manejar rutas no encontradas
 app.use((req, res, next) => {
@@ -44,6 +55,10 @@ app.use((req, res, next) => {
       login: 'POST /auth/login',
       profile: 'GET /auth/profile (requiere token)',
       verify: 'GET /auth/verify (requiere token)',
+      productos: 'GET /productos (requiere token)',
+      producto: 'GET /productos/:id (requiere token)',
+      updateStock: 'PUT /productos/:id (requiere token)',
+      estadisticas: 'GET /productos/stats (requiere token)',
       docs: 'GET /'
     }
   });
