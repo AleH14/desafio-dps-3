@@ -380,7 +380,7 @@ curl -X PUT http://localhost:3000/productos/1 \
 git clone https://github.com/AleH14/desafio-dps-3.git
 ```
 
-### 2. Navegar a la carpeta del backend
+### 2. Navegar a la carpeta del frontend
 
 ```bash
 cd desafio-dps-3
@@ -392,10 +392,14 @@ cd frontend
 ```bash
 npm install
 ```
-### 3. Configurar ip
-Modifica el archivo api.js que se encuentra en frontend/services/api.js coloca tu ip
+### 3. Configurar IP
+Modifica el archivo api.js que se encuentra en 
+```bash
+frontend/services/api.js
+```
+Ahi coloca tu IP
 
-# Manual de usuario
+# 🗃️ Manual de usuario
 ### Iniciar sesion
 Inicia el frontend y backend 
 ```bash
