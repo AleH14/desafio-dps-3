@@ -370,7 +370,7 @@ curl -X PUT http://localhost:3000/productos/1 \
 - Verifica que la base de datos esté inicializada correctamente
 - Revisa los logs del servidor para más detalles
   
-# Backend - API de Productos
+# Frontend -Interfaz
 
 ## 🚀 Instalación
 
@@ -396,10 +396,15 @@ npm install
 Modifica el archivo api.js que se encuentra en frontend/services/api.js coloca tu ip
 
 # Manual de usuario
+### Iniciar sesion
+Inicia el frontend y backend 
+```bash
+npm install
+```
 
 ### Iniciar sesion
 
-Ingresa un usuario y contraseña 
+Ingresa un usuario y contraseña por ejemplo:
 usuario: admin
 contraseña: 123456
 
