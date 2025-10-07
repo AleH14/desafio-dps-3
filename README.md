@@ -409,8 +409,8 @@ npm install
 ### Iniciar sesion
 
 Ingresa un usuario y contraseña por ejemplo:
-usuario: admin
-contraseña: 123456
+- usuario: admin
+- contraseña: 123456
 
 ### Escanear QR 
 
