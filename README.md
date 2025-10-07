@@ -400,7 +400,7 @@ frontend/services/api.js
 Ahi coloca tu IP
 
 # 🗃️ Manual de usuario
-### Iniciar sesion
+### Iniciar servidor
 Inicia el frontend y backend 
 ```bash
 npm install
