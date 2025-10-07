@@ -369,3 +369,40 @@ curl -X PUT http://localhost:3000/productos/1 \
 ### No se encuentran productos
 - Verifica que la base de datos esté inicializada correctamente
 - Revisa los logs del servidor para más detalles
+  
+# Backend - API de Productos
+
+## 🚀 Instalación
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/AleH14/desafio-dps-3.git
+```
+
+### 2. Navegar a la carpeta del backend
+
+```bash
+cd desafio-dps-3
+cd frontend
+```
+
+### 3. Instalar dependencias
+
+```bash
+npm install
+```
+### 3. Configurar ip
+Modifica el archivo api.js que se encuentra en frontend/services/api.js coloca tu ip
+
+# Manual de usuario
+
+### Iniciar sesion
+
+Ingresa un usuario y contraseña 
+usuario: admin
+contraseña: 123456
+
+### Escanear QR 
+
+Genera el codigo qr de un numero en https://www.qr-code-generator.com/ y luego escanealo y veras el producto con ese ID, si no existe ningun producto con ese ID te mostrara una alerta.
