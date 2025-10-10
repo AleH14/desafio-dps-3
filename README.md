@@ -1,13 +1,20 @@
-# Backend - API de Productos
+# 📦 Sistema de Inventario
 
-Este es el backend de la aplicación de gestión de productos. Proporciona una API RESTful con autenticación JWT para gestionar productos.
+Sistema completo de gestión de inventario con funcionalidad de escaneo QR, desarrollado con backend en Node.js y frontend en React Native/Expo.
+
+---
 
 ## 📋 Requisitos Previos
 
-- Node.js (versión 14 o superior)
-- npm (gestor de paquetes de Node.js)
+Antes de comenzar, asegúrate de tener instalado:
 
-## 🚀 Instalación
+- **Node.js** (versión 14 o superior)
+- **npm** (gestor de paquetes de Node.js)
+- **Git**
+
+---
+
+## 🚀 Instalación del Backend
 
 ### 1. Clonar el repositorio
 
@@ -30,24 +37,45 @@ npm install
 
 ### 4. Configurar variables de entorno
 
+#### 4.1 Crear archivo de configuración
+
 Crea un archivo `.env` en la carpeta `backend` basándote en el archivo `.env.example`:
 
 ```bash
 cp .env.example .env
 ```
 
-Genera un token secreto seguro ejecutando:
+#### 4.2 Generar token JWT seguro
+
+Ejecuta el siguiente comando para generar un token secreto:
 
 ```bash
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
-Copia el resultado y pégalo en tu archivo `.env`:
+Este comando generará una cadena alfanumérica aleatoria similar a:
+```
+9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08...
+```
+
+#### 4.3 Configurar el archivo .env
+
+Abre el archivo `.env` con tu editor de texto favorito y configura las siguientes variables:
 
 ```env
 JWT_SECRET=tu_token_generado_aqui
 JWT_EXPIRES=1h
+PORT=3000
 ```
+
+**Ejemplo:**
+```env
+JWT_SECRET=9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+JWT_EXPIRES=1h
+PORT=3000
+```
+
+> ⚠️ **Importante:** Nunca compartas tu `JWT_SECRET` públicamente ni lo subas a repositorios públicos.
 
 ### 5. Iniciar el servidor
 
@@ -57,361 +85,184 @@ npm start
 
 El servidor debería iniciarse en `http://localhost:3000`
 
----
-
-## 🔑 Autenticación
-
-### Obtener un token de acceso
-
-Para utilizar la API, primero debes autenticarte y obtener un token JWT.
-
-**Endpoint:** `POST /auth/login`
-
-**Request:**
-```json
-{
-  "username": "admin",
-  "password": "123456"
-}
-```
-
-**Ejemplo con curl:**
-```bash
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"123456"}'
-```
-
-**Respuesta esperada:**
-```json
-{
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expiresIn": "1h"
-}
-```
-
-> ⚠️ **Importante:** Guarda el token, lo necesitarás para todas las demás peticiones.
+✅ **Backend configurado correctamente**
 
 ---
 
-## 📦 Endpoints de Productos
+## 🎨 Instalación del Frontend
 
-Todos los endpoints de productos requieren el token de autenticación en el header `Authorization`.
+### 1. Navegar a la carpeta del frontend
 
-### 1. Listar todos los productos
-
-**Endpoint:** `GET /productos`
-
-**Headers:**
-```
-Authorization: Bearer TU_TOKEN_AQUI
-```
-
-**Ejemplo con curl:**
-```bash
-curl -X GET http://localhost:3000/productos \
-  -H "Authorization: Bearer TU_TOKEN_AQUI"
-```
-
-**Respuesta esperada:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "nombre": "Samsung Galaxy S21",
-      "descripcion": "Smartphone de alta gama",
-      "precio": 799.99,
-      "stock": 25,
-      "categoria": "Electrónicos",
-      "imagen": "url_imagen"
-    },
-    {
-      "id": 2,
-      "nombre": "MacBook Pro",
-      "descripcion": "Laptop profesional",
-      "precio": 1999.99,
-      "stock": 10,
-      "categoria": "Computadoras",
-      "imagen": "url_imagen"
-    }
-  ]
-}
-```
-
-### 2. Obtener un producto específico
-
-**Endpoint:** `GET /productos/:id`
-
-**Headers:**
-```
-Authorization: Bearer TU_TOKEN_AQUI
-```
-
-**Ejemplo con curl:**
-```bash
-curl -X GET http://localhost:3000/productos/1 \
-  -H "Authorization: Bearer TU_TOKEN_AQUI"
-```
-
-**Respuesta esperada:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "nombre": "Samsung Galaxy S21",
-    "descripcion": "Smartphone de alta gama",
-    "precio": 799.99,
-    "stock": 25,
-    "categoria": "Electrónicos",
-    "imagen": "url_imagen"
-  }
-}
-```
-
-**Error si no existe:**
-```json
-{
-  "success": false,
-  "message": "Producto no encontrado"
-}
-```
-
-### 3. Buscar productos
-
-**Endpoint:** `GET /productos?search=termino`
-
-**Headers:**
-```
-Authorization: Bearer TU_TOKEN_AQUI
-```
-
-**Ejemplo con curl:**
-```bash
-curl -X GET "http://localhost:3000/productos?search=samsung" \
-  -H "Authorization: Bearer TU_TOKEN_AQUI"
-```
-
-**Respuesta esperada:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "nombre": "Samsung Galaxy S21",
-      "descripcion": "Smartphone de alta gama",
-      "precio": 799.99,
-      "stock": 25,
-      "categoria": "Electrónicos",
-      "imagen": "url_imagen"
-    },
-    {
-      "id": 5,
-      "nombre": "Samsung TV 55\"",
-      "descripcion": "Smart TV 4K",
-      "precio": 699.99,
-      "stock": 15,
-      "categoria": "Electrónicos",
-      "imagen": "url_imagen"
-    }
-  ]
-}
-```
-
-### 4. Filtrar por categoría
-
-**Endpoint:** `GET /productos?categoria=nombre_categoria`
-
-**Headers:**
-```
-Authorization: Bearer TU_TOKEN_AQUI
-```
-
-**Ejemplo con curl:**
-```bash
-curl -X GET "http://localhost:3000/productos?categoria=Electrónicos" \
-  -H "Authorization: Bearer TU_TOKEN_AQUI"
-```
-
-**Respuesta esperada:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "nombre": "Samsung Galaxy S21",
-      "descripcion": "Smartphone de alta gama",
-      "precio": 799.99,
-      "stock": 25,
-      "categoria": "Electrónicos",
-      "imagen": "url_imagen"
-    },
-    {
-      "id": 3,
-      "nombre": "iPhone 13",
-      "descripcion": "Smartphone Apple",
-      "precio": 999.99,
-      "stock": 30,
-      "categoria": "Electrónicos",
-      "imagen": "url_imagen"
-    }
-  ]
-}
-```
-
-### 5. Actualizar stock de un producto
-
-**Endpoint:** `PUT /productos/:id`
-
-**Headers:**
-```
-Authorization: Bearer TU_TOKEN_AQUI
-Content-Type: application/json
-```
-
-**Body:**
-```json
-{
-  "stock": 50
-}
-```
-
-**Ejemplo con curl:**
-```bash
-curl -X PUT http://localhost:3000/productos/1 \
-  -H "Authorization: Bearer TU_TOKEN_AQUI" \
-  -H "Content-Type: application/json" \
-  -d '{"stock":50}'
-```
-
-**Respuesta esperada:**
-```json
-{
-  "success": true,
-  "message": "Stock actualizado correctamente",
-  "data": {
-    "id": 1,
-    "nombre": "Samsung Galaxy S21",
-    "descripcion": "Smartphone de alta gama",
-    "precio": 799.99,
-    "stock": 50,
-    "categoria": "Electrónicos",
-    "imagen": "url_imagen"
-  }
-}
-```
-
----
-
-## ⚠️ Manejo de Errores
-
-### Token inválido o expirado
-```json
-{
-  "success": false,
-  "message": "Token inválido o expirado"
-}
-```
-
-### Sin autorización
-```json
-{
-  "success": false,
-  "message": "No se proporcionó token de autenticación"
-}
-```
-
-### Credenciales incorrectas
-```json
-{
-  "success": false,
-  "message": "Credenciales inválidas"
-}
-```
-
----
-
-## 🛠️ Tecnologías Utilizadas
-
-- Node.js
-- Express.js
-- JSON Web Tokens (JWT)
-- bcrypt (para encriptación de contraseñas)
-
----
-
-## 📝 Notas
-
-- El token JWT expira en 1 hora por defecto (configurable en `.env`)
-- Las credenciales por defecto son: `admin` / `123456`
-- Asegúrate de mantener tu `JWT_SECRET` seguro y no compartirlo públicamente
-- El archivo `.env` está incluido en `.gitignore` para proteger tus credenciales
-
----
-
-## 🐛 Solución de Problemas
-
-### El servidor no inicia
-- Verifica que todas las dependencias estén instaladas: `npm install`
-- Asegúrate de que el archivo `.env` exista y tenga las variables correctas
-- Revisa que el puerto 3000 no esté siendo utilizado por otra aplicación
-
-### Error de autenticación
-- Verifica que el token sea válido y no haya expirado
-- Asegúrate de incluir "Bearer " antes del token en el header Authorization
-- Genera un nuevo token haciendo login nuevamente
-
-### No se encuentran productos
-- Verifica que la base de datos esté inicializada correctamente
-- Revisa los logs del servidor para más detalles
-  
-# Frontend -Interfaz
-
-## 🚀 Instalación
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/AleH14/desafio-dps-3.git
-```
-
-### 2. Navegar a la carpeta del frontend
+Desde la raíz del proyecto:
 
 ```bash
 cd desafio-dps-3
 cd frontend
 ```
 
-### 3. Instalar dependencias
+### 2. Instalar dependencias
 
 ```bash
 npm install
 ```
-### 3. Configurar IP
-Modifica el archivo api.js que se encuentra en 
-```bash
+
+### 3. Configurar la IP del servidor
+
+#### 3.1 Localizar el archivo de configuración
+
+El archivo de configuración se encuentra en:
+```
 frontend/services/api.js
 ```
-Ahi coloca tu IP
 
-# 🗃️ Manual de usuario
-### Iniciar servidor
-Inicia el frontend y backend 
+#### 3.2 Obtener tu dirección IP local
+
+**En Windows:**
 ```bash
-npm install
+ipconfig
+```
+Busca la línea que dice `Dirección IPv4` en tu adaptador de red activo.
+
+**En Mac/Linux:**
+```bash
+ifconfig
+```
+o
+```bash
+ip addr show
 ```
 
-### Iniciar sesion
+Busca tu dirección IP local (generalmente empieza con `192.168.x.x` o `10.x.x.x`).
 
-Ingresa un usuario y contraseña por ejemplo:
-- usuario: admin
-- contraseña: 123456
+#### 3.3 Modificar el archivo api.js
 
-### Escanear QR 
+Abre el archivo `frontend/services/api.js` y localiza la siguiente línea:
 
-Genera el codigo qr de un numero en https://www.qr-code-generator.com/ y luego escanealo y veras el producto con ese ID, si no existe ningun producto con ese ID te mostrara una alerta.
+```javascript
+const API_URL = 'http://localhost:3000';
+```
+
+Reemplaza `localhost` con tu dirección IP local:
+
+```javascript
+const API_URL = 'http://192.168.1.100:3000'; // Reemplaza con tu IP
+```
+
+**Ejemplo completo del archivo:**
+
+```javascript
+// frontend/services/api.js
+const API_URL = 'http://192.168.1.100:3000'; // Tu IP local
+
+export default {
+  baseURL: API_URL,
+  // ... resto de configuración
+};
+```
+
+> 💡 **Nota:** Si estás ejecutando el frontend en un dispositivo físico, asegúrate de que el dispositivo esté en la misma red WiFi que tu computadora.
+
+### 4. Iniciar la aplicación
+
+```bash
+npm start
+```
+
+✅ **Frontend configurado correctamente**
+
+---
+
+## 📱 Manual de Usuario
+
+### Iniciar el Sistema Completo
+
+1. **Inicia el backend:**
+   ```bash
+   cd backend
+   npm start
+   ```
+
+2. **En otra terminal, inicia el frontend:**
+   ```bash
+   cd frontend
+   npm start
+   ```
+
+### Iniciar Sesión
+
+Al abrir la aplicación, ingresa las credenciales por defecto:
+
+- **Usuario:** `Admin`
+- **Contraseña:** `123456`
+
+### Escanear Código QR
+
+1. En la aplicación, dirígete a la sección de escaneo QR
+2. Genera un código QR de prueba con un ID de producto en: https://www.qr-code-generator.com/
+3. Escanea el código QR con la aplicación
+4. Si el producto existe, se mostrarán sus detalles
+5. Si el producto no existe, aparecerá una alerta informativa
+
+---
+
+## 📚 Documentación Adicional
+
+- Para información detallada sobre los endpoints del API, consulta el archivo [README.md en la carpeta backend](./backend/README.md)
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+- **Backend:** Node.js, Express
+- **Frontend:** React Native, Expo
+- **Autenticación:** JWT
+- **Escaneo QR:** Cámara nativa
+
+---
+
+## 👨‍💻 Desarrolladores
+
+Este proyecto fue desarrollado por:
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/marcelavasquez11">
+        <img src="https://github.com/marcelavasquez11.png" width="100px;" alt="Marcela Vasquez"/><br />
+        <sub><b>Marcela Vasquez</b></sub>
+      </a><br />
+      <a href="https://github.com/marcelavasquez11">@marcelavasquez11</a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/AleH14">
+        <img src="https://github.com/AleH14.png" width="100px;" alt="Alejandro Hernandez"/><br />
+        <sub><b>Alejandro Hernandez</b></sub>
+      </a><br />
+      <a href="https://github.com/AleH14">@AleH14</a>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 👥 Contribución
+
+Si deseas contribuir al proyecto, por favor:
+
+1. Haz fork del repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📄 Licencia
+
+Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+
+---
+
+## 💬 Soporte
+
+Si encuentras algún problema o tienes preguntas, por favor abre un issue en el repositorio.
