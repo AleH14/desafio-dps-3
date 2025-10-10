@@ -32,7 +32,7 @@ export default function Inventario() {
     cargarProductos();
   }, []);
 
-  // Función para cargar productos desde el API
+  //funcion para mostrar productos
   const cargarProductos = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -43,10 +43,9 @@ export default function Inventario() {
       }
 
       const res = await API.get("/productos", {
-        headers: { Authorization: `Bearer ${token}` }, // token en headers
+        headers: { Authorization: `Bearer ${token}` }, //pasar token por header
       });
 
-      // Validar que exista array de productos
       const productosApi = res.data?.data?.productos;
       if (!productosApi || !Array.isArray(productosApi)) {
         Alert.alert("Error", "No se recibieron productos del API");
@@ -64,7 +63,6 @@ export default function Inventario() {
     }
   };
 
- // filtrar los productos
   useEffect(() => {
     if (search === "") {
       setFilteredProductos(productos);
@@ -78,9 +76,8 @@ export default function Inventario() {
     }
   }, [search, productos]);
 
-  // Función para actualizar stock manualmente
-  const actualizarStockManual = async () => {
-    const nuevoStock = parseInt(nuevoStockInput);
+  //  Función original de actualizar stock manualmente
+  const actualizarStockManual = async (nuevoStock) => {
     if (isNaN(nuevoStock) || nuevoStock < 0) {
       Alert.alert("Error", "Ingrese un número válido");
       return;
@@ -112,11 +109,36 @@ export default function Inventario() {
       Alert.alert("Error", "No se pudo actualizar el stock");
     }
   };
-  // Función para manejar el escaneo de código de barras
+
+  //  Añadir stock
+  const añadirStock = () => {
+    const valor = parseInt(nuevoStockInput);
+    if (isNaN(valor) || valor <= 0) {
+      Alert.alert("Error", "Ingrese un número válido para añadir");
+      return;
+    }
+    const nuevoStock = productoSeleccionado.stock + valor;
+    actualizarStockManual(nuevoStock);
+  };
+
+  //  Disminuir stock
+  const disminuirStock = () => {
+    const valor = parseInt(nuevoStockInput);
+    if (isNaN(valor) || valor <= 0) {
+      Alert.alert("Error", "Ingrese un número válido para disminuir");
+      return;
+    }
+    const nuevoStock = productoSeleccionado.stock - valor;
+    if (nuevoStock < 0) {
+      Alert.alert("Error", "El stock no puede ser negativo");
+      return;
+    }
+    actualizarStockManual(nuevoStock);
+  };
+ //funcion para escanear qr
   const handleBarCodeScanned = async ({ data }) => {
     try {
       setScanning(false);
-
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         Alert.alert("Error", "No se encontró el token de autenticación");
@@ -124,7 +146,7 @@ export default function Inventario() {
       }
 
       const res = await API.get(`/productos/${data}`, {
-        headers: { Authorization: `Bearer ${token}` }, //pasar token 
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const producto = res.data?.data?.producto;
@@ -139,7 +161,8 @@ export default function Inventario() {
       Alert.alert("Error", "No se pudo obtener el producto");
     }
   };
-  // Función para manejar el botón de escanear
+  //permisos de camara
+
   const handleScanPress = async () => {
     if (!permission?.granted) {
       const { granted } = await requestPermission();
@@ -185,7 +208,7 @@ export default function Inventario() {
         />
       </View>
 
-      {/* Lista de productos*/}
+      {/* Lista de productos */}
       <FlatList
         data={filteredProductos}
         keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
@@ -201,7 +224,6 @@ export default function Inventario() {
                 marginBottom: 5,
               }}
             >
-              {/* ID en círculo */}
               <View
                 style={{
                   width: 30,
@@ -217,12 +239,9 @@ export default function Inventario() {
                   {item.id}
                 </Text>
               </View>
-
-              {/* Nombre */}
               <Text style={[styles.nombre, { flex: 3 }]}>{item.nombre}</Text>
             </View>
 
-            {/* Fila con categoría y stock */}
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
@@ -237,7 +256,7 @@ export default function Inventario() {
         )}
       />
 
-      {/*Modal de descripcion de productos*/}
+      {/* Modal de producto */}
       {productoSeleccionado && (
         <Modal visible={true} transparent animationType="slide">
           <View style={styles.modalContainer}>
@@ -260,20 +279,24 @@ export default function Inventario() {
               <Text>Precio: ${productoSeleccionado.precio}</Text>
               <Text>Descripción: {productoSeleccionado.descripcion}</Text>
 
+              {/*  Input para cantidad */}
               <TextInput
-                placeholder="Nuevo stock"
+                placeholder="Cantidad a modificar"
                 value={nuevoStockInput}
                 onChangeText={setNuevoStockInput}
                 keyboardType="numeric"
                 style={styles.input}
               />
-              <TouchableOpacity
-                style={styles.botonActualizar}
-                onPress={actualizarStockManual}
-              >
-                <MaterialIcons name="check" size={24} color="white" />
-                <Text style={styles.textoBoton}>Actualizar Stock</Text>
-              </TouchableOpacity>
+
+              {/*  Botones de añadir/disminuir */}
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <TouchableOpacity style={[styles.botonActualizar, { backgroundColor: "green", flex: 1, marginRight: 5 }]} onPress={añadirStock}>
+                  <Text style={styles.textoBoton}>Añadir Stock</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.botonActualizar, { backgroundColor: "red", flex: 1, marginLeft: 5 }]} onPress={disminuirStock}>
+                  <Text style={styles.textoBoton}>Disminuir Stock</Text>
+                </TouchableOpacity>
+              </View>
 
               <TouchableOpacity onPress={() => setProductoSeleccionado(null)}>
                 <Text style={styles.cerrar}>Cerrar</Text>
@@ -282,6 +305,7 @@ export default function Inventario() {
           </View>
         </Modal>
       )}
+
       {/* Botón para escanear código QR */}
       {!scanning && (
         <TouchableOpacity style={styles.boton} onPress={handleScanPress}>
@@ -289,6 +313,7 @@ export default function Inventario() {
           <Text style={styles.textoBoton}>Escanear QR</Text>
         </TouchableOpacity>
       )}
+
       {/* Modal de escaneo */}
       {scanning && (
         <Modal visible={scanning} animationType="slide">
@@ -301,12 +326,6 @@ export default function Inventario() {
           <Button
             title="Cerrar cámara"
             onPress={() => setScanning(false)}
-            style={{
-              position: "absolute",
-              top: 40,
-              right: 20,
-              backgroundColor: "#525FF1",
-            }}
           />
         </Modal>
       )}
@@ -319,24 +338,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: "#fff",
-    paddingBottom: 40,
-  },
-  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
+    paddingBottom: 40 },
+  loader: { 
+    flex: 1,
+     justifyContent: "center", 
+     alignItems: "center" },
   input: {
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "#f1f1f1", 
     padding: 10,
     borderRadius: 8,
-    marginBottom: 10,
-  },
-  card: {
+    marginBottom: 10 },
+  card: { 
     padding: 10,
     marginVertical: 5,
-    borderRadius: 5,
-    backgroundColor: "#f9f9f9",
-  },
-  nombre: {
-    fontWeight: "bold",
-  },
+    borderRadius: 5, 
+    backgroundColor: "#f9f9f9" },
+  nombre: { fontWeight: "bold" },
   boton: {
     flexDirection: "row",
     alignItems: "center",
@@ -346,12 +363,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginVertical: 15,
   },
-  textoBoton: {
-    color: "#fff",
+  textoBoton: { 
+    color: "#fff", 
     fontWeight: "bold",
     fontSize: 16,
     marginLeft: 8,
-  },
+    textAlign: "center" },
   botonActualizar: {
     backgroundColor: "#525FF1",
     padding: 12,
@@ -362,23 +379,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
+    flex: 1, 
+    justifyContent: "center", 
+    backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { 
     backgroundColor: "#fff",
     margin: 20,
     padding: 15,
-    borderRadius: 10,
-  },
-  titulo: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
-  cerrar: { color: "blue", marginTop: 15, textAlign: "center" },
-  botonRegresar: {
-    backgroundColor: "#888",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
-  },
+    borderRadius: 10 },
+  titulo: {
+     fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10 },
+  cerrar: { color: "blue",
+     marginTop: 15, 
+     textAlign: "center" },
 });
